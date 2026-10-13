@@ -1,15 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
-import { createClient } from '@supabase/supabase-js'
 import type { Session } from '@supabase/supabase-js'
 import { LoginPage } from './pages/LoginPage'
 import { Workspace } from './pages/Workspace'
 import { Brand } from './components/Brand'
+import { supabase } from './lib/supabase'
+import type { Preferences } from './types/chat'
 
-const url = import.meta.env.VITE_SUPABASE_URL
-const key = import.meta.env.VITE_SUPABASE_ANON_KEY
-const supabase = url && key ? createClient(url, key) : null
-export interface Profile { id: string; username: string; display_name: string; avatar_path: string | null; status_text: string; last_seen: string | null }
+export interface Profile { id: string; username: string; display_name: string; avatar_path: string | null; status_text: string; last_seen: string | null; preferences?: Preferences }
 
 export function App() {
   const navigate = useNavigate()
@@ -26,7 +24,7 @@ export function App() {
     async function restore(next: Session | null) {
       const current = ++generation
       if (!next) { if (alive) { setSession(null); setProfile(null); setLoading(false) }; return }
-      const { data, error } = await client.from('profiles').select('id,username,display_name,avatar_path,status_text,last_seen').eq('id', next.user.id).maybeSingle()
+      const { data, error } = await client.from('profiles').select('id,username,display_name,avatar_path,status_text,last_seen,preferences').eq('id', next.user.id).maybeSingle()
       if (!alive || current !== generation) return
       if (error || !data) {
         setSession(null); setProfile(null); setNotice(error ? 'This space has not been provisioned yet. The owner needs to finish the private account setup.' : 'This account is not approved for Nanba Chat.'); setLoading(false)

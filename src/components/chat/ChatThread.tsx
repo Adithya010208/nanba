@@ -1,0 +1,15 @@
+import {useEffect,useRef,useState} from 'react'
+import {Pin} from 'lucide-react'
+import type {Message,Reaction} from '../../types/chat'
+import {MessageBubble} from './MessageBubble'
+export function ChatThread({messages,userId,reactions,stars,pin,typing,peerName,hasOlder,loadingOlder,onOlder,onAction,onReact,onOpen,onError}:{messages:Message[];userId:string;reactions:Reaction[];stars:Set<string>;pin:string|null;typing:boolean;peerName:string;hasOlder:boolean;loadingOlder:boolean;onOlder:()=>Promise<void>;onAction:(action:string,message:Message)=>void;onReact:(reaction:string,message:Message)=>void;onOpen:(message:Message)=>void;onError:(error:string)=>void}){
+  const container=useRef<HTMLDivElement>(null)
+  const bottom=useRef<HTMLDivElement>(null)
+  const previousLast=useRef('')
+  const [firstUnread]=useState(()=>messages.find(message=>message.sender_id!==userId&&!message.read_at)?.id)
+  const pinned=messages.find(message=>message.id===pin)
+  const last=messages.at(-1)
+  useEffect(()=>{const node=container.current;if(!node)return;const nearBottom=node.scrollHeight-node.scrollTop-node.clientHeight<180;const newLast=last?.id||'';if(newLast!==previousLast.current&&(nearBottom||last?.sender_id===userId||!previousLast.current))bottom.current?.scrollIntoView({block:'end'});previousLast.current=newLast},[last?.id,last?.sender_id,userId])
+  return <>{pinned&&!pinned.deleted_for_everyone_at&&<button className="pinned-banner" onClick={()=>document.getElementById(`message-${pinned.id}`)?.scrollIntoView({behavior:'smooth',block:'center'})}><Pin size={14}/><strong>Pinned</strong><span>{pinned.text_content||pinned.media_name}</span></button>}<div className="chat-thread" ref={container}>{hasOlder&&<button className="older-messages" disabled={loadingOlder} onClick={async()=>{const node=container.current;const oldHeight=node?.scrollHeight||0;const oldTop=node?.scrollTop||0;try{await onOlder();requestAnimationFrame(()=>{if(node)node.scrollTop=oldTop+node.scrollHeight-oldHeight})}catch(caught){onError(caught instanceof Error?caught.message:'Couldn’t load older messages.')}}}>{loadingOlder?'Loading…':'Earlier messages'}</button>}{messages.map((message,index)=>{const previous=messages[index-1];const date=new Date(message.created_at).toLocaleDateString('en',{day:'numeric',month:'short',year:'numeric'});const newDate=!previous||new Date(previous.created_at).toDateString()!==new Date(message.created_at).toDateString();return <div key={message.id}>{newDate&&<div className="date-divider"><span>{date}</span></div>}{message.id===firstUnread&&<div className="unread-divider">New messages</div>}<MessageBubble message={message} own={message.sender_id===userId} reply={messages.find(value=>value.id===message.reply_to_message_id)} starred={stars.has(message.id)} pinned={pin===message.id} reactions={reactions.filter(value=>value.message_id===message.id)} onAction={onAction} onReact={onReact} onOpen={onOpen} onError={onError}/></div>})}{typing&&<div className="typing-message"><i/><i/><i/><span>{peerName} is typing</span></div>}<div ref={bottom}/></div></>
+}
+
