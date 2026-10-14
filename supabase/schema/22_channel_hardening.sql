@@ -1,0 +1,5 @@
+drop policy nanba_realtime_receive on realtime.messages;
+drop policy nanba_realtime_send on realtime.messages;
+create policy nanba_realtime_receive on realtime.messages for select to authenticated using(extension in('broadcast','presence') and exists(select 1 from public.conversation_members where user_id=auth.uid() and realtime.topic() in('nanba:'||conversation_id::text,'nanba:'||conversation_id::text||':calls','nanba:'||conversation_id::text||':actions','nanba:'||conversation_id::text||':collections')));
+create policy nanba_realtime_send on realtime.messages for insert to authenticated with check(extension in('broadcast','presence') and exists(select 1 from public.conversation_members where user_id=auth.uid() and realtime.topic() in('nanba:'||conversation_id::text,'nanba:'||conversation_id::text||':calls','nanba:'||conversation_id::text||':actions','nanba:'||conversation_id::text||':collections')));
+alter publication supabase_realtime add table public.hidden_messages,public.starred_messages,public.saved_links;

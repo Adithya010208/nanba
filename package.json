@@ -7,7 +7,8 @@
     "dev": "vite --host 127.0.0.1 --port 3000",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview --host 127.0.0.1 --port 3000"
+    "preview": "vite preview --host 127.0.0.1 --port 3000",
+    "check:public": "node scripts/check-public.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.117.3",
@@ -23,6 +24,7 @@
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",
     "@vitejs/plugin-react": "5.2.0",
+    "esbuild": "0.28.2",
     "eslint": "9.39.1",
     "eslint-plugin-react-hooks": "7.0.1",
     "eslint-plugin-react-refresh": "0.4.24",

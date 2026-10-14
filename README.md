@@ -1,55 +1,48 @@
-# Nanba Chat
+# NANBA CHAT
 
-A private, two-person communication app. React, TypeScript, Vite, Tailwind CSS and Supabase. Deployment target: Vercel.
+A private communication app for exactly two approved people, built with React, strict TypeScript, Vite, Tailwind CSS, Supabase and WebRTC. Light mode is the default; dark/system themes are available.
 
-## Current checkpoint
-
-Phase 1: application foundation and interface. **Not a complete production app yet.**
-
-Implemented: responsive sign-in page, desktop and mobile workspace, conversation empty state, media/files/calls/saved/notes views, search interface, attachment draft selection, emoji insertion, local theme selection and browser notification permission request. Sign-in uses Supabase Auth with normalized `username@nanba.internal` identities and checks for a profile before allowing the workspace. Authorization must also be enforced in the database; frontend checks alone are insufficient.
-
-Messaging, media upload, call setup, profile changes, notes and privacy controls are intentionally unavailable until their secure backend phases are implemented. No sample conversations, fake receipts, fake presence or fake calls are used.
-
-## Local development
-
-Requires Node.js 22.12 or later.
+## Start
 
 ```sh
 npm ci
-cp .env.example .env.local
-# Fill in your Supabase URL and public publishable key.
 npm run dev
 ```
 
-Open http://127.0.0.1:3000. The user-supplied public connection details are already in the ignored local environment file in this workspace.
+Open http://127.0.0.1:3000 and sign in as `karupu` or `sai` using the password you created in Supabase. No password is present in this repository. The ignored local environment file already contains the public Supabase connection details you supplied. For a new checkout, fill in `.env.example` and save it as `.env.local`.
 
-To inspect the interface before account provisioning, open http://127.0.0.1:3000/chat?preview=design. This is available **only in development**, explicitly labeled as a design preview, and contains no backend data. It does not grant access to Supabase or exist in the production build.
+## Checks
 
 ```sh
 npm run lint
 npm run build
+npm run check:public
+npm audit
 ```
 
-## Required next step: Supabase access
+`check:public` requires the configured `.env.local` and an internet connection. It verifies that anonymous app access and relay credential requests are rejected and that public signup is disabled. All these checks passed on October 14, 2026.
 
-The requested project is `rrwmdouffeiguwxuzspl`. It is not visible in the currently connected Supabase account. The public publishable key cannot create database tables, policies, private buckets, approved users, or Edge Functions.
+## Features implemented in source
 
-Connect the owning account/organization through the Supabase plugin. The next phase creates approved profiles for exactly two users, with usernames `adith` and `nanba` unless changed. Passwords must be set securely in Supabase Authentication; do not paste passwords into chat or source files. Public signup must be disabled.
+Username/password authentication, approval validation, session persistence, logout/password changes, realtime messages, send/retry states, delivery/read receipts, presence/typing, pagination, reply/edit/delete/reactions/save/pin/copy, private images/videos/audio/documents, upload progress/cancel, voice notes, galleries, search, saved links, shared notes with conflict detection, browser voice/video calling, mute/camera/screen sharing, history, profile/avatar/privacy/appearance settings, storage review/cleanup, browser notifications and installable PWA support.
 
-Do not deploy this checkpoint as a finished communication app. Database provisioning, RLS, realtime authorization, private storage, calling and cross-network verification are required first.
+There are no fabricated conversations, receipts, presence indicators, call connections or third-user signup screens.
 
-## Calling and zero-cost target
+## Status and release gates
 
-WebRTC can connect directly using STUN. TURN relay fallback is needed when direct connectivity is blocked. Metered Open Relay currently advertises a free 20 GB monthly TURN allowance, requiring an account: https://www.metered.ca/tools/openrelay/. A free tier is finite and does not guarantee unlimited zero-cost use or connection quality. Its API key must be held in a server-side Supabase Edge Function, never in a `VITE_` variable. No paid service has been enabled.
+The source build and database boundary tests have passed, but the product is **not yet fully production-verified**. The explicitly approved private realtime update is applied and verified, and public signup is disabled. Confirm the Realtime dashboard's public-access switch is off. Desktop/mobile visual verification and actual two-device/mobile-network calling tests remain mandatory.
 
-## Deployment configuration
+Calls have no app-imposed duration limit. Direct WebRTC is the default. Some mobile/restricted networks need optional TURN fallback; unlimited reliable relay service for free is not promised. Text/files are private but not end-to-end encrypted. Notifications require the app to remain open.
 
-After the remaining phases are finished, import the repository into Vercel as a Vite project. Build command: `npm run build`. Output directory: `dist`.
+See [DEPLOYMENT.md](DEPLOYMENT.md) for exact launch, Vercel, Supabase, calling and test instructions, and [DELIVERY-REPORT.md](DELIVERY-REPORT.md) for architecture, security policies and known limits.
 
-Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in Vercel. The supplied `NEXT_PUBLIC_` names have been converted to Vite's `VITE_` convention. Never place service-role keys, database passwords or TURN API secrets in frontend environment variables.
+## Repository
 
-The `vercel.json` provides SPA routing and security headers. Its content security policy currently permits only the selected Supabase project and must be reviewed when backend/calling behavior changes.
+- `src/`: app, reusable UI, auth/chat/media/call features, generated database types.
+- `supabase/schema/`: SQL scripts used for the hosted setup. Hosted migration history is maintained by Supabase; these files are descriptive source snapshots, not CLI-generated migration filenames.
+- `supabase/functions/turn-credentials/`: approved-user-only STUN/optional TURN configuration.
+- `supabase/tests/access.sql`: transactional database access/ownership tests, rolled back after execution.
+- `scripts/check-public.mjs`: anonymous API/configuration readiness checks.
+- `public/`: brand icon, manifest, offline page and service worker.
 
-## Development phases remaining
-
-Follow the user's original brief in order: secure auth/profiles → conversation schema/RLS → realtime text → receipts → presence/typing → message actions → private images → other media → voice notes → galleries/search/saved → call signalling → voice WebRTC → TURN → video → screen sharing → call history → notifications → PWA → notes/links → settings → security audit → cross-device testing → production release.
+No GitHub remote or Vercel deployment has been created. Keep `.env*` ignored except `.env.example`, and never expose administrative credentials or relay API secrets in the client.

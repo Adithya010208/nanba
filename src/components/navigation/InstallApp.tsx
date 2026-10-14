@@ -1,0 +1,4 @@
+import {useEffect,useState} from 'react'
+import {Download} from 'lucide-react'
+interface InstallEvent extends Event{prompt:()=>Promise<void>;userChoice:Promise<{outcome:'accepted'|'dismissed'}>}
+export function InstallApp(){const[event,setEvent]=useState<InstallEvent|null>(null);useEffect(()=>{const capture=(value:Event)=>{value.preventDefault();setEvent(value as InstallEvent)};const installed=()=>setEvent(null);window.addEventListener('beforeinstallprompt',capture);window.addEventListener('appinstalled',installed);return()=>{window.removeEventListener('beforeinstallprompt',capture);window.removeEventListener('appinstalled',installed)}},[]);if(!event)return null;return<button className="install-button" onClick={async()=>{await event.prompt();await event.userChoice;setEvent(null)}}><Download size={16}/>Install Nanba</button>}

@@ -1,0 +1,3 @@
+create function public.unused_uploads() returns table(path text) language sql stable security invoker set search_path='' as $$select o.name from storage.objects o where o.bucket_id='chat-media' and (storage.foldername(o.name))[2]=auth.uid()::text and o.created_at<now()-interval '1 hour' and not exists(select 1 from public.messages m where m.media_path=o.name and m.deleted_for_everyone_at is null) and not exists(select 1 from public.profiles p where p.avatar_path=o.name) order by o.created_at limit 100$$;
+revoke all on function public.unused_uploads() from public;
+grant execute on function public.unused_uploads() to authenticated;

@@ -1,0 +1,317 @@
+[
+  {
+    "schemaname": "public",
+    "tablename": "calls",
+    "policyname": "calls_insert",
+    "cmd": "INSERT",
+    "roles": "{authenticated}",
+    "qual": null,
+    "with_check": "((caller_id = auth.uid()) AND nanba_private.member(conversation_id) AND (status = 'calling'::text) AND (EXISTS ( SELECT 1\n   FROM conversation_members\n  WHERE ((conversation_members.user_id = calls.receiver_id) AND (conversation_members.conversation_id = calls.conversation_id)))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "calls",
+    "policyname": "calls_read",
+    "cmd": "SELECT",
+    "roles": "{authenticated}",
+    "qual": "nanba_private.member(conversation_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "calls",
+    "policyname": "calls_update",
+    "cmd": "UPDATE",
+    "roles": "{authenticated}",
+    "qual": "(nanba_private.member(conversation_id) AND ((auth.uid() = caller_id) OR (auth.uid() = receiver_id)))",
+    "with_check": "(nanba_private.member(conversation_id) AND ((auth.uid() = caller_id) OR (auth.uid() = receiver_id)))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "conversation_members",
+    "policyname": "members_read",
+    "cmd": "SELECT",
+    "roles": "{authenticated}",
+    "qual": "nanba_private.member(conversation_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "conversations",
+    "policyname": "conversation_read",
+    "cmd": "SELECT",
+    "roles": "{authenticated}",
+    "qual": "nanba_private.member(id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "hidden_messages",
+    "policyname": "hidden_delete",
+    "cmd": "DELETE",
+    "roles": "{authenticated}",
+    "qual": "((user_id = auth.uid()) AND nanba_private.message_access(message_id))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "hidden_messages",
+    "policyname": "hidden_insert",
+    "cmd": "INSERT",
+    "roles": "{authenticated}",
+    "qual": null,
+    "with_check": "((user_id = auth.uid()) AND nanba_private.message_access(message_id))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "hidden_messages",
+    "policyname": "hidden_read",
+    "cmd": "SELECT",
+    "roles": "{authenticated}",
+    "qual": "((user_id = auth.uid()) AND nanba_private.message_access(message_id))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "message_reactions",
+    "policyname": "reaction_delete",
+    "cmd": "DELETE",
+    "roles": "{authenticated}",
+    "qual": "((user_id = auth.uid()) AND nanba_private.message_access(message_id))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "message_reactions",
+    "policyname": "reaction_insert",
+    "cmd": "INSERT",
+    "roles": "{authenticated}",
+    "qual": null,
+    "with_check": "((user_id = auth.uid()) AND nanba_private.message_access(message_id))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "message_reactions",
+    "policyname": "reaction_read",
+    "cmd": "SELECT",
+    "roles": "{authenticated}",
+    "qual": "nanba_private.message_access(message_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "messages",
+    "policyname": "messages_read",
+    "cmd": "SELECT",
+    "roles": "{authenticated}",
+    "qual": "nanba_private.member(conversation_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "messages",
+    "policyname": "messages_send",
+    "cmd": "INSERT",
+    "roles": "{authenticated}",
+    "qual": null,
+    "with_check": "((sender_id = auth.uid()) AND nanba_private.member(conversation_id) AND (delivered_at IS NULL) AND (read_at IS NULL) AND (edited_at IS NULL) AND (deleted_for_everyone_at IS NULL))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "messages",
+    "policyname": "messages_update",
+    "cmd": "UPDATE",
+    "roles": "{authenticated}",
+    "qual": "nanba_private.member(conversation_id)",
+    "with_check": "nanba_private.member(conversation_id)"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "pinned_messages",
+    "policyname": "pin_delete",
+    "cmd": "DELETE",
+    "roles": "{authenticated}",
+    "qual": "nanba_private.member(conversation_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "pinned_messages",
+    "policyname": "pin_insert",
+    "cmd": "INSERT",
+    "roles": "{authenticated}",
+    "qual": null,
+    "with_check": "((pinned_by = auth.uid()) AND (EXISTS ( SELECT 1\n   FROM messages m\n  WHERE ((m.id = pinned_messages.message_id) AND (m.conversation_id = pinned_messages.conversation_id) AND (m.deleted_for_everyone_at IS NULL)))) AND nanba_private.member(conversation_id))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "pinned_messages",
+    "policyname": "pin_read",
+    "cmd": "SELECT",
+    "roles": "{authenticated}",
+    "qual": "nanba_private.member(conversation_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "pinned_messages",
+    "policyname": "pin_update",
+    "cmd": "UPDATE",
+    "roles": "{authenticated}",
+    "qual": "nanba_private.member(conversation_id)",
+    "with_check": "((pinned_by = auth.uid()) AND (EXISTS ( SELECT 1\n   FROM messages m\n  WHERE ((m.id = pinned_messages.message_id) AND (m.conversation_id = pinned_messages.conversation_id) AND (m.deleted_for_everyone_at IS NULL)))) AND nanba_private.member(conversation_id))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "profiles",
+    "policyname": "profiles_own_update",
+    "cmd": "UPDATE",
+    "roles": "{authenticated}",
+    "qual": "(id = auth.uid())",
+    "with_check": "(id = auth.uid())"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "profiles",
+    "policyname": "profiles_read",
+    "cmd": "SELECT",
+    "roles": "{authenticated}",
+    "qual": "nanba_private.approved()",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "saved_links",
+    "policyname": "links_create",
+    "cmd": "INSERT",
+    "roles": "{authenticated}",
+    "qual": null,
+    "with_check": "((user_id = auth.uid()) AND nanba_private.member(conversation_id) AND ((message_id IS NULL) OR (EXISTS ( SELECT 1\n   FROM messages\n  WHERE ((messages.id = saved_links.message_id) AND (messages.conversation_id = saved_links.conversation_id))))))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "saved_links",
+    "policyname": "links_delete",
+    "cmd": "DELETE",
+    "roles": "{authenticated}",
+    "qual": "((user_id = auth.uid()) AND nanba_private.member(conversation_id))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "saved_links",
+    "policyname": "links_read",
+    "cmd": "SELECT",
+    "roles": "{authenticated}",
+    "qual": "((user_id = auth.uid()) AND nanba_private.member(conversation_id))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shared_notes",
+    "policyname": "notes_create",
+    "cmd": "INSERT",
+    "roles": "{authenticated}",
+    "qual": null,
+    "with_check": "((created_by = auth.uid()) AND (updated_by = auth.uid()) AND nanba_private.member(conversation_id))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shared_notes",
+    "policyname": "notes_delete",
+    "cmd": "DELETE",
+    "roles": "{authenticated}",
+    "qual": "nanba_private.member(conversation_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shared_notes",
+    "policyname": "notes_read",
+    "cmd": "SELECT",
+    "roles": "{authenticated}",
+    "qual": "nanba_private.member(conversation_id)",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "shared_notes",
+    "policyname": "notes_update",
+    "cmd": "UPDATE",
+    "roles": "{authenticated}",
+    "qual": "nanba_private.member(conversation_id)",
+    "with_check": "((updated_by = auth.uid()) AND nanba_private.member(conversation_id))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "starred_messages",
+    "policyname": "starred_delete",
+    "cmd": "DELETE",
+    "roles": "{authenticated}",
+    "qual": "((user_id = auth.uid()) AND nanba_private.message_access(message_id))",
+    "with_check": null
+  },
+  {
+    "schemaname": "public",
+    "tablename": "starred_messages",
+    "policyname": "starred_insert",
+    "cmd": "INSERT",
+    "roles": "{authenticated}",
+    "qual": null,
+    "with_check": "((user_id = auth.uid()) AND nanba_private.message_access(message_id))"
+  },
+  {
+    "schemaname": "public",
+    "tablename": "starred_messages",
+    "policyname": "starred_read",
+    "cmd": "SELECT",
+    "roles": "{authenticated}",
+    "qual": "((user_id = auth.uid()) AND nanba_private.message_access(message_id))",
+    "with_check": null
+  },
+  {
+    "schemaname": "realtime",
+    "tablename": "messages",
+    "policyname": "nanba_realtime_receive",
+    "cmd": "SELECT",
+    "roles": "{authenticated}",
+    "qual": "((extension = ANY (ARRAY['broadcast'::text, 'presence'::text])) AND (EXISTS ( SELECT 1\n   FROM conversation_members\n  WHERE ((conversation_members.user_id = auth.uid()) AND ((((realtime.topic() = ('nanba:'::text || (conversation_members.conversation_id)::text)) OR (realtime.topic() = (('nanba:'::text || (conversation_members.conversation_id)::text) || ':calls'::text))) OR (realtime.topic() = (('nanba:'::text || (conversation_members.conversation_id)::text) || ':actions'::text))) OR (realtime.topic() = (('nanba:'::text || (conversation_members.conversation_id)::text) || ':collections'::text)))))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "realtime",
+    "tablename": "messages",
+    "policyname": "nanba_realtime_send",
+    "cmd": "INSERT",
+    "roles": "{authenticated}",
+    "qual": null,
+    "with_check": "((extension = ANY (ARRAY['broadcast'::text, 'presence'::text])) AND (EXISTS ( SELECT 1\n   FROM conversation_members\n  WHERE ((conversation_members.user_id = auth.uid()) AND ((((realtime.topic() = ('nanba:'::text || (conversation_members.conversation_id)::text)) OR (realtime.topic() = (('nanba:'::text || (conversation_members.conversation_id)::text) || ':calls'::text))) OR (realtime.topic() = (('nanba:'::text || (conversation_members.conversation_id)::text) || ':actions'::text))) OR (realtime.topic() = (('nanba:'::text || (conversation_members.conversation_id)::text) || ':collections'::text)))))))"
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "nanba_media_read",
+    "cmd": "SELECT",
+    "roles": "{authenticated}",
+    "qual": "((bucket_id = 'chat-media'::text) AND (EXISTS ( SELECT 1\n   FROM conversation_members m\n  WHERE ((m.user_id = auth.uid()) AND ((m.conversation_id)::text = (storage.foldername(objects.name))[1])))) AND (((storage.foldername(name))[2] = (auth.uid())::text) OR (EXISTS ( SELECT 1\n   FROM messages\n  WHERE ((messages.media_path = objects.name) AND (messages.deleted_for_everyone_at IS NULL)))) OR (EXISTS ( SELECT 1\n   FROM profiles\n  WHERE (profiles.avatar_path = objects.name)))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "nanba_media_remove",
+    "cmd": "DELETE",
+    "roles": "{authenticated}",
+    "qual": "((bucket_id = 'chat-media'::text) AND ((storage.foldername(name))[2] = (auth.uid())::text) AND (EXISTS ( SELECT 1\n   FROM conversation_members m\n  WHERE ((m.user_id = auth.uid()) AND ((m.conversation_id)::text = (storage.foldername(objects.name))[1])))) AND (NOT (EXISTS ( SELECT 1\n   FROM messages\n  WHERE ((messages.media_path = objects.name) AND (messages.deleted_for_everyone_at IS NULL))))) AND (NOT (EXISTS ( SELECT 1\n   FROM profiles\n  WHERE (profiles.avatar_path = objects.name)))))",
+    "with_check": null
+  },
+  {
+    "schemaname": "storage",
+    "tablename": "objects",
+    "policyname": "nanba_media_upload",
+    "cmd": "INSERT",
+    "roles": "{authenticated}",
+    "qual": null,
+    "with_check": "((bucket_id = 'chat-media'::text) AND ((storage.foldername(name))[2] = (auth.uid())::text) AND (EXISTS ( SELECT 1\n   FROM conversation_members m\n  WHERE ((m.user_id = auth.uid()) AND ((m.conversation_id)::text = (storage.foldername(objects.name))[1])))))"
+  }
+]

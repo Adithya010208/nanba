@@ -5,6 +5,7 @@ export interface Message {
   local_state?: 'sending' | 'failed';
 }
 export interface Preferences { read_receipts: boolean; last_seen: boolean; notifications: boolean; notification_preview: boolean }
+export type SendMessage = Pick<Message,'message_type'> & Partial<Pick<Message,'text_content'|'media_path'|'media_name'|'media_size'|'media_mime_type'|'thumbnail_path'|'reply_to_message_id'>>
 export interface Reaction { message_id: string; user_id: string; reaction: string }
 export interface Note { id: string; title: string; content: string; created_by: string; updated_by: string; updated_at: string }
-export interface CallRecord { id: string; conversation_id: string; caller_id: string; receiver_id: string; call_type: 'voice' | 'video'; status: string; started_at: string; answered_at: string | null; ended_at: string | null; duration_seconds: number | null }
+export interface CallRecord { id: string; conversation_id: string; caller_id: string; receiver_id: string; call_type: 'voice' | 'video'; status: string; started_at: string; answered_at: string | null; connected_at: string | null; ended_at: string | null; duration_seconds: number | null }

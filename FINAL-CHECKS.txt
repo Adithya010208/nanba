@@ -1,0 +1,33 @@
+Checkpoint: 2026-10-14
+
+npm run lint: exit 0; no reported lint issues.
+npm run build: exit 0; strict TypeScript passed.
+Vite: 1660 modules transformed; built in 7.59 seconds.
+dist/index.html: 0.90 kB, gzip 0.46 kB
+CSS: 47.09 kB, gzip 10.74 kB
+React chunk: 50.07 kB, gzip 17.66 kB
+Supabase chunk: 223.38 kB, gzip 58.50 kB
+App chunk: 310.37 kB, gzip 95.49 kB
+
+node scripts/check-media.mjs: exit 0
+PASS: file signature checks reject mismatched PNG, PDF and binary TXT; supported headers pass.
+
+node scripts/check-reconciliation.mjs: exit 0
+PASS: real receipts, optimistic reconciliation, deletion protection and duplicate prevention.
+
+npm run check:public: exit 0
+Anonymous profiles, messages, calls, shared_notes and saved_links access denied/empty: PASS
+Public signup disabled: PASS
+Anonymous relay credential request rejected: PASS
+
+Private realtime migration: success true; four exact membership-scoped topics verified.
+hidden_messages, starred_messages and saved_links realtime publication entries verified.
+RLS policy definitions exported from the live database to RLS-POLICIES.json.
+Database boundary and personal-item isolation tests passed; test writes rolled back.
+Dependency audit at final dependency checkpoint: zero vulnerabilities.
+git diff --check: exit 0 after whitespace cleanup.
+.env.local: Git ignored and untracked.
+
+Not verified: real browser account login, desktop/mobile visuals, actual media permissions,
+PWA installation, cross-network WebRTC quality and Realtime dashboard public-access toggle.
+No GitHub push or Vercel deployment performed.
